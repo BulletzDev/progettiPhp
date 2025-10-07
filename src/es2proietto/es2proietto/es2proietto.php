@@ -1,6 +1,7 @@
 <?php
-function is_palindrome($str){
-    return $str == strrev($str)?"palindorma": "non palindroma";
+function is_palindrome($str)
+{
+    return $str == strrev($str) ? "palindorma" : "non palindroma";
 }
 ?>
 
@@ -17,14 +18,14 @@ function is_palindrome($str){
     <form action="es2proietto.php" method="get">
         <label for="str1">Insert String:</label>
         <input type="text" id="str1" name="str1"><br><br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="">
     </form>
     <?php
     if (isset($_GET['str1']) && $_GET['str1'] !== "") {
         $input = $_GET['str1'];
         $input_sv = preg_replace('/[aeiouAEIOUàèéìòùÀÈÉÌÒÙ]/', '', $input);
-        echo '<p>la stringa '. htmlspecialchars($input) . ' è ' . is_palindrome($input) . '</p>';
-        echo '<p>la stringa '. htmlspecialchars($input) . ' senza vocali è ' . htmlspecialchars($input_sv) . '</p>';
+        echo '<p>la stringa ' . htmlspecialchars($input) . ' è ' . is_palindrome($input) . '</p>';
+        echo '<p>la stringa ' . htmlspecialchars($input) . ' senza vocali è ' . htmlspecialchars($input_sv) . '</p>';
     } else {
         echo "<p>Inserisci una stringa</p>";
     }
