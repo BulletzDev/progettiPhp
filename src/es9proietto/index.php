@@ -9,19 +9,19 @@
 <form class="row g-3 text-center m-auto w-25" method="POST" action="invioDati.php">
     <div class="col-md-6">
         <label for="inputName" class="form-label">Name</label>
-        <input type="text" class="form-control" id="inputName" name="name">
+        <input required type="text" class="form-control" id="inputName" name="name">
     </div>
     <div class="col-md-6">
         <label for="inputSurname" class="form-label">Surname</label>
-        <input type="text" class="form-control" id="inputSurname" name="surname">
+        <input required type="text" class="form-control" id="inputSurname" name="surname">
     </div>
     <div class="col-12">
         <label for="inputEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="inputEmail" name="email">
+        <input required type="email" class="form-control" id="inputEmail" name="email">
     </div>
     <div class="col-12">
         <label for="inputMessage" class="form-label">Message</label>
-        <textarea class="form-control" id="inputMessage" name="message" rows="3"></textarea>
+        <textarea required class="form-control" id="inputMessage" name="message" rows="3"></textarea>
     </div>
     <div class="col-12 mt-3 ">
         <button type="submit" class="btn btn-primary">Sign in</button>
