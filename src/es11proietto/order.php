@@ -2,14 +2,38 @@
 session_start();
 
 $message = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
-    $id = $_POST['product_id'];
-    if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+
+// Set/validate current table (form must POST 'table')
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['table'])) {
+    $table = trim($_POST['table']);
+    if ($table === '') {
+        $message = "Inserisci un numero tavolo valido.";
+    } else {
+        $_SESSION['current_table'] = $table;
+        $message = "Tavolo '" . htmlspecialchars($table, ENT_QUOTES) . "' impostato.";
     }
-    // Aggiungo l'id al carrello
-    $_SESSION['cart'][] = $id;
-    $message = "Prodotto '$id' aggiunto al carrello.";
+}
+
+// Add product only if a table is set
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
+    if (!isset($_SESSION['current_table'])) {
+        $message = "Imposta il tavolo prima di aggiungere prodotti.";
+    } else {
+        $id = trim($_POST['product_id']);
+        if ($id === '') {
+            $message = "Nome prodotto non valido.";
+        } else {
+            if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
+                $_SESSION['cart'] = [];
+            }
+            $table = $_SESSION['current_table'];
+            if (!isset($_SESSION['cart'][$table]) || !is_array($_SESSION['cart'][$table])) {
+                $_SESSION['cart'][$table] = [];
+            }
+            $_SESSION['cart'][$table][] = $id;
+            $message = "Prodotto '" . htmlspecialchars($id, ENT_QUOTES) . "' aggiunto al tavolo " . htmlspecialchars($table, ENT_QUOTES) . ".";
+        }
+    }
 }
 
 include "./headTemplate.php";
@@ -27,9 +51,9 @@ include "./headTemplate.php";
   <!-- Table selector -->
   <div class="row mb-3">
     <div class="col-12 text-center">
-      <form id="tableForm" class="d-inline-block">
+      <form id="tableForm" class="d-inline-block" method="post">
         <div class="input-group w-100 mx-auto">
-          <input id="tableField" name="table" type="text" class="form-control" placeholder="Numero tavolo (es. 5)" required>
+          <input id="tableField" name="table" type="number" class="form-control" placeholder="Numero tavolo (es. 5)" required>
           <button class="btn btn-primary" type="submit">Imposta Tavolo</button>
         </div>
       </form>
@@ -37,94 +61,20 @@ include "./headTemplate.php";
     </div>
   </div>
 
-<script>
-  // Keep current table in localStorage so it persists while the waiter navigates
-  let currentTable = localStorage.getItem('currentTable') || '';
-
-  const tableField = document.getElementById('tableField');
-  const tableForm = document.getElementById('tableForm');
-  const tableBadge = document.getElementById('currentTableBadge');
-
-  function renderTableBadge() {
-    if (currentTable) {
-      tableBadge.textContent = "Tavolo selezionato: " + currentTable;
-      tableField.value = currentTable;
-    } else {
-      tableBadge.textContent = "Nessun tavolo selezionato";
-      tableField.value = '';
-    }
-  }
-
-  // Initialize display
-  renderTableBadge();
-
-  tableForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const v = tableField.value.trim();
-    if (!v) {
-      alert('Inserisci un numero tavolo valido.');
-      return;
-    }
-    currentTable = v;
-    localStorage.setItem('currentTable', currentTable);
-    renderTableBadge();
-
-    // Update any existing hidden product_id inputs so they include the table prefix
-    document.querySelectorAll('input[name="product_id"][type="hidden"]').forEach(inp => {
-      // keep only product name part (remove existing prefix if any)
-      const parts = inp.value.split('|');
-      const productName = parts.slice(1).join('|') || parts[0];
-      inp.value = currentTable + '|' + productName;
-    });
-  });
-
-  // Enhance existing static product-group forms so each has a hidden product_id and an "Aggiungi" button
-  document.querySelectorAll('.product-group').forEach(group => {
-    const form = group.querySelector('form');
-    if (!form) return;
-
-    // Extract first span text as product name
-    const nameSpan = group.querySelector('.input-group .input-group-text');
-    const productName = (nameSpan && nameSpan.textContent.trim()) || 'Prodotto';
-
-    // Replace form contents with a consistent structure (keeps classes/layout)
-    form.innerHTML = `
-      <div class="input-group mb-0 w-50 mx-auto">
-        <input type="hidden" name="product_id" value="${currentTable ? currentTable + '|' : ''}${productName}">
-        <span class="input-group-text">${productName}</span>
-        <button class="btn btn-outline-primary" type="submit">Aggiungi</button>
+    <?php
+    $current_table = $_SESSION['current_table'] ?? '';
+    $escaped_table = htmlspecialchars($current_table, ENT_QUOTES);
+    ?>
+    <?php if ($current_table !== ''): ?>
+      <div id="currentTableBadge" class="mb-3" style="font-weight:600;">
+        Tavolo corrente: <?php echo $escaped_table; ?>
       </div>
-    `;
-  });
-
-  // Intercept any product form submission to ensure table prefix is present.
-  document.addEventListener('submit', function (e) {
-    const form = e.target;
-    if (!(form instanceof HTMLFormElement)) return;
-
-    const prodInput = form.querySelector('input[name="product_id"]');
-    if (!prodInput) return; // not a product form
-
-    // Ensure a table is selected
-    if (!currentTable) {
-      e.preventDefault();
-      alert('Imposta prima il numero del tavolo.');
-      return;
-    }
-
-    // If input is text (dynamic custom product), prefix its value
-    // If input is hidden (predefined product), ensure it starts with table|
-    const val = prodInput.value || '';
-    const hasPrefix = val.startsWith(currentTable + '|');
-    if (!hasPrefix) {
-      // Remove any previous numeric| prefix and then prepend current table
-      const parts = val.split('|');
-      const productName = parts.length > 1 ? parts.slice(1).join('|') : val;
-      prodInput.value = currentTable + '|' + productName;
-    }
-    // allow normal submit after adjusting value
-  });
-</script>
+      <script>
+        document.getElementById('tableField').value = '<?php echo $escaped_table; ?>';
+      </script>
+    <?php else: ?>
+      <div id="currentTableBadge" class="mb-2" style="font-weight:600;"></div>
+    <?php endif; ?>
 
   <div class="product-group text-center mb-3" data-category="Bevande">
     <div class="d-flex justify-content-center align-items-center gap-2">
