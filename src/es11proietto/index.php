@@ -19,7 +19,6 @@ if(isset($_POST["username"]) && isset($_POST["password"])){
 if(isset($_POST["errorSess"])){
     echo "<div class='alert alert-warning w-25 mx-auto text-center' role='alert'>Devi effettuare il login per accedere alla pagina richiesta.</div>";
 }
-
 ?>
 
 <div class="input mb-3 w-25 mx-auto">
