@@ -1,0 +1,68 @@
+<?php 
+session_start();
+require_once '​quiz_data.php';
+if(isset($_POST['Reset'])){
+    session_destroy();
+    header('Location: index.php');
+    exit();
+}
+if (!isset($_SESSION['index'])) {
+    $_SESSION['index'] = 0;
+}
+if(!isset($_SESSION['quiz_completed'])) {
+    $_SESSION['quiz_completed'] = false;
+}
+if (!isset($_SESSION['score'])) {
+    $_SESSION['score'] = 0;
+}
+if (isset($_POST['answerGiven'])) {
+    header('Location: process_answer.php');
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pop Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4 text-center">
+
+<h1>Pop Quiz</h1>
+
+<?php
+if (!$_SESSION['quiz_completed']) {
+    echo "<h4>{$_SESSION['quiz_data'][$_SESSION['index']]['question']}</h4>";
+} else {
+    echo "<h3>Quiz completed! Your score: {$_SESSION['score']} out of " . count($_SESSION['quiz_data']) . "</h3>";
+    echo '<form method="post" class="mt-3">
+            <button type="submit" name="Reset" value="true" class="btn btn-danger">Restart Quiz</button>
+          </form>';
+}
+?>
+
+<?php if (!$_SESSION['quiz_completed']){ ?>
+<form method="post" class="mt-3">
+
+    <?php 
+    $options = $_SESSION['quiz_data'][$_SESSION['index']]['options'];
+    foreach ($options as $i => $option) {
+        echo "
+        <div class='form-check'>
+            <input class='form-check-input' type='radio' name='radio1' value='$i' " . ($i === 0 ? "checked" : "") . ">
+            <label class='form-check-label'>$option</label>
+        </div>";
+    }
+    ?>
+
+    <button type="submit" name="answerGiven" value="true" class="btn btn-primary mt-3">Answer</button>
+</form>
+<?php }?>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
