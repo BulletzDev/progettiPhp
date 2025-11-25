@@ -1,6 +1,7 @@
 <?php 
 session_start();
 require_once '​quiz_data.php';
+require_once 'process_answer.php';
 if(isset($_POST['Reset'])){
     session_destroy();
     header('Location: index.php');
