@@ -10,7 +10,8 @@ if (isset($_GET["customerNumber"])) {
 $sql = "SELECT customerNumber, customerName, contactLastName, contactFirstName, phone FROM customers";
 $result = $conn->query($sql);?>
     <h2>Customer List</h2>
-    <table cellpadding="10" class=" bordered table table-striped mx-auto">
+    <a href="../es20proietto/insertOrder.php" >Add new order</a>
+    <table cellpadding="10" class=" bordered table table-striped mx-auto mt-3">
         <tr>
             <th>Customer Number</th>
             <th>Customer Name</th>

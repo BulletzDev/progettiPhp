@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 
 <div class="input mb-3 w-50 mx-auto">
-    <form method="post" id="orderForm">
+    <form method="post" id="orderForm" class="mb-3">
         <div class="row g-3">
             <div class="col-6">
                 <label class="form-label">Customer</label>
@@ -66,6 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <button id="confirmBtn" type="submit" class="btn btn-dark" disabled>Confirm</button>
         </div>
     </form>
+    <a href="../es14proietto/custList.php">See customer list</a>
 </div>
 
 <script>
@@ -84,8 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             item.addEventListener('click', function(e){
                 e.preventDefault();
                 const parentMenu = this.closest('.dropdown-menu');
-                if(!parentMenu) return;
-                // decide which dropdown this belongs to by checking nearest dropdown button
+                if(!parentMenu) return;  
                 const dropdown = parentMenu.parentElement;
                 if(dropdown.contains(customerBtn) || parentMenu.previousElementSibling === customerBtn){
                     customerInput.value = this.getAttribute('data-value');
@@ -98,12 +98,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             });
         });
 
-        // optional: reset placeholder when focusing
         ['customerBtn','productBtn'].forEach(id=>{
             document.getElementById(id).addEventListener('shown.bs.dropdown', ()=>{});
         });
 
-        // initial state
         updateState();
     })();
 </script>
