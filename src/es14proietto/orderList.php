@@ -29,6 +29,7 @@ if ($result->num_rows > 0) {
 } else {
     echo "0 results";
 }
+?><a href="custList.php">Return to Customer list</a><?php
 $conn->close();
 include_once 'bottomTemplate.php';
 ?>

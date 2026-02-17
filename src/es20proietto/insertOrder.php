@@ -11,13 +11,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $customerId = $conn->real_escape_string($_POST["customer_id"]);
     $productId = $conn->real_escape_string($_POST["product_id"]);
     $amount = (int)$_POST["amount"];
+    $price = (float)$conn->real_escape_string($_POST["price"]);
 
     // Insert new order
     $sqlInsertOrder = "INSERT INTO orders (orderNumber,customerNumber, orderDate, status, requiredDate) VALUES ('$orderId', '$customerId', NOW(), 'In Process', DATE_ADD(NOW(), INTERVAL 5 DAY))";
     if ($conn->query($sqlInsertOrder) === TRUE) {
 
-        $sqlInsertDetails = "INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber) VALUES ('$orderId', '$productId', '$amount', (SELECT MSRP FROM products WHERE productCode='$productId'), 1)";
-        $sqlPaymentDetails = "INSERT INTO payments (customerNumber, checkNumber, paymentDate, amount) VALUES ('$customerId', 'CHK$orderId', NOW(), (SELECT MSRP FROM products WHERE productCode='$productId') * $amount)";
+         $sqlInsertDetails = "INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber) VALUES ('$orderId', '$productId', '$amount', $price, 1)";
+        $sqlPaymentDetails = "INSERT INTO payments (customerNumber, checkNumber, paymentDate, amount) VALUES ('$customerId', 'CHK$orderId', NOW(), " . ($price * $amount) . ")";
         if ($conn->query($sqlInsertDetails) === TRUE && $conn->query($sqlPaymentDetails) === TRUE) {
             echo "<div class='alert alert-success text-center'>Order successfully created!</div>";
         } else {
@@ -62,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </div>
         <input type="number" name="amount" id="amount" class="form-control w-50 mx-auto mt-3" min="1" placeholder="Amount" required>
+        <input type="number" name="price" id="price" class="form-control w-50 mx-auto mt-3" min="1" placeholder="Price" required>
         <div class="text-center mt-3">
             <button id="confirmBtn" type="submit" class="btn btn-dark" disabled>Confirm</button>
         </div>
