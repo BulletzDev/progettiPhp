@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION['state']) || $_SESSION['state'] !== 'LOGGED_IN') {
+        header('Location: ../es21proietto/index.php');
+        exit;
+}
+
 include_once 'connection.php';
 include_once 'headTemplate.php';
 
@@ -9,7 +15,17 @@ if (isset($_GET["customerNumber"])) {
 }
 $sql = "SELECT customerNumber, customerName, contactLastName, contactFirstName, phone FROM customers";
 $result = $conn->query($sql);?>
-    <h2>Customer List</h2>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Customer Management</a>
+                <div class="d-flex align-items-center">
+                    <span class="me-3">Logged in as: <?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?></span>
+                    <a class="btn btn-outline-secondary" href="logout.php">Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <h2>Customer List</h2>
     <a href="../es20proietto/insertOrder.php" >Add new order</a>
     <table cellpadding="10" class=" bordered table table-striped mx-auto mt-3">
         <tr>
