@@ -1,4 +1,9 @@
 <?php 
+session_start();
+if (!isset($_SESSION['state']) || $_SESSION['state'] !== 'LOGGED_IN') {
+    header('Location: ../es21proietto/index.php');
+    exit;
+}
 include 'headTemplate.php'; 
 include_once 'connection.php';
 $sql = "SELECT customerNumber, customerName, contactLastName, contactFirstName FROM customers";
